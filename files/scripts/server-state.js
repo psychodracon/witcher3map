@@ -171,7 +171,13 @@
       lastRevision = response.revision;
     }
 
-    if (response.data && typeof response.data === "object") {
+    const localBody = snapshotJson();
+    if (response.data && typeof response.data === "object" && !Array.isArray(response.data)) {
+      if (localStorage.length > 0 && localBody !== JSON.stringify(response.data)) {
+        lastSavedJson = null;
+        saveNow();
+        return;
+      }
       applyState(response.data);
       rememberSaved(snapshotJson());
       return;
