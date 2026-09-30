@@ -102,8 +102,10 @@
       }
     };
 
+    xhr.timeout = 10000;
     xhr.onload = finish;
     xhr.onerror = finish;
+    xhr.ontimeout = finish;
     xhr.onabort = finish;
     try {
       xhr.send(body);
@@ -118,6 +120,12 @@
       return;
     }
 
+    if (inFlight) {
+      const xhr = inFlight;
+      inFlight = null;
+      xhr.abort();
+    }
+
     const url = stateUrl(allocateRevision());
     const blob = new Blob([body], { type: "application/json" });
     if (
@@ -129,7 +137,7 @@
     }
 
     fetch(url, {
-      method: "PUT",
+      method: "POST",
       headers: { "Content-Type": "application/json" },
       body,
       keepalive: true,

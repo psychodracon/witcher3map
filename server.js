@@ -54,21 +54,17 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS app_state (
     id INTEGER PRIMARY KEY CHECK (id = 1),
     data TEXT NOT NULL,
-    updated_at TEXT NOT NULL,
-    revision INTEGER NOT NULL DEFAULT 0
+    updated_at TEXT NOT NULL
   );
 `);
 
-const selectState = db.prepare(
-  "SELECT data, revision FROM app_state WHERE id = 1"
-);
+const selectState = db.prepare("SELECT data FROM app_state WHERE id = 1");
 const upsertState = db.prepare(`
-  INSERT INTO app_state (id, data, updated_at, revision)
-  VALUES (1, ?, ?, ?)
+  INSERT INTO app_state (id, data, updated_at)
+  VALUES (1, ?, ?)
   ON CONFLICT(id) DO UPDATE SET
     data = excluded.data,
-    updated_at = excluded.updated_at,
-    revision = excluded.revision
+    updated_at = excluded.updated_at
 `);
 
 console.log(
@@ -80,15 +76,7 @@ console.log(
 
 const storedRow = () => selectState.get() || null;
 
-const readRevision = (row) => {
-  const revision = Number(row && row.revision);
-  if (!Number.isInteger(revision) || revision < 0) {
-    return 0;
-  }
-  return revision;
-};
-
-let latestRevision = readRevision(storedRow());
+let latestRevision = 0;
 
 const readState = () => {
   const row = storedRow();
@@ -111,7 +99,7 @@ const readState = () => {
 };
 
 const writeState = (data, revision) => {
-  upsertState.run(JSON.stringify(data), new Date().toISOString(), revision);
+  upsertState.run(JSON.stringify(data), new Date().toISOString());
   latestRevision = revision;
 };
 
