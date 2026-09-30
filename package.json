@@ -1,0 +1,16 @@
+{
+  "name": "witcher3map",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Witcher 3 interactive maps with SQLite-backed settings",
+  "main": "server.js",
+  "scripts": {
+    "start": "node --experimental-sqlite server.js"
+  },
+  "engines": {
+    "node": ">=22.5"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}

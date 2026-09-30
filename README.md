@@ -3,6 +3,26 @@ Desctiption
 It is an enhanced version of the work published by [untamed0](https://github.com/untamed0).
 I have released version 3.5 as an intermediate version upon popular demand. I'll post updates as development progresses.
 
+Run with Docker
+--------------------------------------
+The map runs in a Node container. Marker progress and other settings are saved to SQLite on a host bind mount.
+
+```bash
+docker compose up --build -d
+```
+
+Open [http://localhost:8080](http://localhost:8080). Override the published port with `PORT=3000 docker compose up --build -d`.
+
+Saved settings are stored in `./data/state.sqlite` on the host (mounted as `/data/state.sqlite` inside the container). Keep the `./data:/data` volume mount in `docker-compose.yml`. Rebuilding the image does not touch that file. Deleting the `data` directory deletes the saved map config.
+
+Change how often the browser writes settings with `SAVE_INTERVAL_IN_SECONDS` (default `30`):
+
+```bash
+SAVE_INTERVAL_IN_SECONDS=60 docker compose up -d
+```
+
+The first image build copies the map tiles (~1.7 GB), so it can take a while.
+
 #### Additional Features (Added by [BaHTsIzBEdEvi](https://github.com/root-BB)):
 * Updated Velen&Novigrad map, which was expanded with the Hearts of Stone Expansion Pack.
 * Added Isle of Mist map.
